@@ -51,6 +51,19 @@
             text-align: center;
             color: #dc3545;
         }
+        nav {
+            background-color: #007bff;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body onload="startUp()">
@@ -119,6 +132,14 @@
             document.getElementById("rebolus").textContent = bolus;
             document.getElementById("rebasal").textContent = basal;
 
+            document.getElementById("rebolus").style.color = "blue";
+
+            if (bolus < 0) {
+                swal("Be careful!", "It seems you are putting too much basal! Try reducing it. " + Math.abs(bolus), "error");
+                document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
+                document.getElementById("rebolus").style.color = "red";
+            }
+
             swal("Success!", "Profile updated successfully.", "success");
         }
 
@@ -133,9 +154,19 @@
         function submitInsulin() {
             const insulinAmount = parseFloat(document.getElementById("insulinno").value);
             const insulinTime = document.getElementById("insulintime").value;
-
+            
+            if (rebolus.textContent === "Set up your profile first!" || rebasal.textContent === "Set up your profile first!") {
+                swal("Cannot Log Insulin!", "Please finish customizing your profile first.", "error");
+                return;
+            }
             if (!insulinAmount || !insulinTime) {
                 swal("Error!", "Please fill in both fields.", "error");
+                return;
+            }
+            const selectedTime = new Date(insulinTime);
+            const currentTime = new Date();
+            if (selectedTime > currentTime) {
+                swal("Invalid Date or Time!", "You cannot log insulin for a future date or time.", "error");
                 return;
             }
 
@@ -146,8 +177,15 @@
             let logs = JSON.parse(localStorage.getItem("insulinLogs")) || [];
             logs.push({ time: insulinTime, amount: insulinAmount });
             localStorage.setItem("insulinLogs", JSON.stringify(logs));
-
+            
             document.getElementById("rebolus").textContent = bolus;
+            document.getElementById("rebolus").style.color = "blue";
+
+            if (bolus < 0) {
+                swal("Be careful!", "Bolus limit exceeded by " + Math.abs(bolus), "error");
+                document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
+                document.getElementById("rebolus").style.color = "red";
+            }
 
             swal("Success!", "Insulin data logged successfully.", "success");
 
