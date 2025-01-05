@@ -68,13 +68,6 @@
 </head>
 <body onload="startUp()">
 
-    <nav>
-        <a href="#insulinRecord">Insulin Record</a>
-        <a href="#personalizeProfile">Profile</a>
-        <a href="#insulinInfo">Info</a>
-        <a href="#dangerArea">Danger Zone</a>
-    </nav>
-
     <h1>Electroblade's Insulin App</h1>
 
     <section id="insulinRecord">
@@ -122,7 +115,7 @@
                 return;
             }
 
-            const totalInsulin = Math.round(weight * 1.5);
+            const totalInsulin = Math.round(weight * 1.5); 
             let bolus, basal;
 
             if (!basalDose) {
@@ -218,6 +211,7 @@
             const basal = localStorage.getItem("totalAllowedBasal");
 
             if (bolus && basal) {
+                swal("Welcome back!", "All your insulin data is backed up!", "success");
                 document.getElementById("rebolus").textContent = bolus;
                 document.getElementById("rebasal").textContent = basal;
             } else {
