@@ -51,18 +51,12 @@
             text-align: center;
             color: #dc3545;
         }
-        nav {
-            background-color: #007bff;
-            padding: 10px;
+        .danger-section p {
+            margin-bottom: 20px;
         }
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        nav a:hover {
-            text-decoration: underline;
+        #insulinSensitivity {
+            font-size: 1.2rem;
+            color: #007bff;
         }
     </style>
 </head>
@@ -86,6 +80,7 @@
             <input type="number" id="bodyweight" class="form-control" placeholder="Body Weight (kg)">
             <input type="number" id="age123" class="form-control" placeholder="Age">
             <input type="number" id="dosedBasal" class="form-control" placeholder="Basal Dose (optional)">
+            
         </div>
         <button class="btn btn-success" onclick="submitData()">Submit</button>
     </section>
@@ -94,6 +89,7 @@
         <h2>Insulin Information</h2>
         <p><b>Bolus Left: </b><span id="rebolus">Set up your profile first!</span></p>
         <p><b>Basal Left: </b><span id="rebasal">Set up your profile first!</span></p>
+        <p><b>Insulin Sensitivity Description: </b><span id="insulinSensitivity">Set up your profile first!</span></p>
     </section>
 
     <section id="dangerArea" class="danger-section">
@@ -116,7 +112,7 @@
             }
 
             const totalInsulin = Math.round(weight * 1.5); 
-            let bolus, basal;
+            let bolus, basal, insulin_sensetivity;
 
             if (!basalDose) {
                 bolus = Math.round((totalInsulin / 10) * 6);
@@ -125,6 +121,15 @@
                 bolus = totalInsulin - basalDose;
                 basal = basalDose;
             }
+            
+            insulin_sensetivity = 100/totalInsulin;
+            insulin_sensetivity = insulin_sensetivity.toFixed(2);
+            insulin_sensetivity = parseFloat(insulin_sensetivity);
+
+            localStorage.setItem("weight", weight);
+            localStorage.setItem("age", age);
+            localStorage.setItem("totalAllowedInsulin", totalInsulin);
+            localStorage.setItem("isf", insulin_sensetivity);
 
             localStorage.setItem("totalAllowedBolus", bolus);
             localStorage.setItem("totalAllowedBasal", basal);
@@ -133,6 +138,12 @@
             document.getElementById("rebasal").textContent = basal;
 
             document.getElementById("rebolus").style.color = "blue";
+            
+            document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensetivity;
+
+            document.getElementById("rebasal").style.color = "blue";
+
+            document.getElementById("insulinSensitivity").style.color = "blue";
 
             if (bolus < 0) {
                 swal("Be careful!", "It seems you are putting too much basal! Try reducing it. " + Math.abs(bolus), "error");
@@ -180,7 +191,6 @@
             
             document.getElementById("rebolus").textContent = bolus;
             document.getElementById("rebolus").style.color = "blue";
-
             if (bolus < 0) {
                 swal("Be careful!", "Bolus limit exceeded by " + Math.abs(bolus), "error");
                 document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
@@ -234,11 +244,14 @@
         function startUp() {
             const bolus = localStorage.getItem("totalAllowedBolus");
             const basal = localStorage.getItem("totalAllowedBasal");
+            const insulin_sensitivity123 = localStorage.getItem("isf");
 
-            if (bolus && basal) {
+            if (bolus && basal && insulin_sensitivity123) {
                 swal("Welcome back!", "All your insulin data is backed up!", "success");
                 document.getElementById("rebolus").textContent = bolus;
                 document.getElementById("rebasal").textContent = basal;
+                document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensitivity123;
+
             } else {
                 swal("Welcome!", "Set up your profile to get started.", "info");
             }
