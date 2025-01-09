@@ -74,6 +74,13 @@
         <canvas id="insulinChart" class="mt-4"></canvas>
     </section>
 
+    <section id="insulinLogs">
+        <h2>Insulin Logbook</h2>
+        <div id="logContainer">
+            <!-- Logs will be dynamically populated here -->
+        </div>
+    </section>
+
     <section id="personalizeProfile">
         <h2>Personalize Your Profile</h2>
         <div class="mb-3">
@@ -300,6 +307,8 @@
             swal("Success!", "Profile updated successfully.", "success");
             
             localStorage.setItem("lastLogin", new Date().toLocaleDateString());
+
+            displayInsulinLogs();
         }
 
         function deleteAllData() {
@@ -308,6 +317,7 @@
             document.getElementById("rebolus").textContent = "Set up your profile first!";
             document.getElementById("rebasal").textContent = "Set up your profile first!";
             location.reload();
+            displayInsulinLogs();
         }
 
         function submitInsulin() {
@@ -348,6 +358,37 @@
             swal("Success!", "Insulin data logged successfully.", "success");
 
             generateInsulinGraph();
+            displayInsulinLogs();
+        }
+
+
+        function displayInsulinLogs() {
+            const logs = JSON.parse(localStorage.getItem("insulinLogs")) || [];
+            const logContainer = document.getElementById("logContainer");
+            logContainer.innerHTML = ""; // Clear previous logs
+
+            if (logs.length === 0) {
+                logContainer.innerHTML = "<p>No logs available.</p>";
+                return;
+            }
+
+            logs.forEach(log => {
+                const logDiv = document.createElement("div");
+                logDiv.classList.add("insulin-log");
+
+                const amountSpan = document.createElement("span");
+                amountSpan.textContent = `${log.amount} units injected at `;
+
+                const timeSpan = document.createElement("span");
+                timeSpan.textContent = `${new Date(log.time).toLocaleString()}.`;
+
+                
+
+                logDiv.appendChild(timeSpan);
+                logDiv.appendChild(amountSpan);
+
+                logContainer.appendChild(logDiv);
+            });
         }
 
         function generateInsulinGraph() {
@@ -425,6 +466,7 @@
             }
 
             generateInsulinGraph();
+            displayInsulinLogs();
         }
     </script>
 </body>
