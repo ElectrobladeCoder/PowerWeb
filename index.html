@@ -58,6 +58,11 @@
             font-size: 1.2rem;
             color: #007bff;
         }
+
+        #carbRatio {
+            font-size: 1.2rem;
+            color: #007bff;
+        }
     </style>
 </head>
 <body onload="startUp()">
@@ -97,6 +102,7 @@
         <p><b>Bolus Left: </b><span id="rebolus">Set up your profile first!</span></p>
         <p><b>Basal Left: </b><span id="rebasal">Set up your profile first!</span></p>
         <p><b>Insulin Sensitivity Description (Correction Factor): </b><span id="insulinSensitivity">Set up your profile first!</span></p>
+        <p><b>Carbohydrate Ratio: </b><span id="carbRatio">Set up your profile first!</span></p>
     </section>
 
     <section id="dangerArea" class="danger-section">
@@ -256,13 +262,14 @@
             const age = parseInt(document.getElementById("age123").value, 10);
             const basalDose = parseFloat(document.getElementById("dosedBasal").value);
 
+
             if (!weight || !age) {
                 swal("Error!", "Please fill in all required fields.", "error");
                 return;
             }
 
             const totalInsulin = Math.round(weight * 1.5); 
-            let bolus, basal, insulin_sensetivity;
+            let bolus, basal, insulin_sensetivity, carbRatio;
 
             if (!basalDose) {
                 bolus = Math.round((totalInsulin / 10) * 6);
@@ -271,10 +278,16 @@
                 bolus = totalInsulin - basalDose;
                 basal = basalDose;
             }
+
+            
             
             insulin_sensetivity = 100/totalInsulin;
             insulin_sensetivity = insulin_sensetivity.toFixed(2);
             insulin_sensetivity = parseFloat(insulin_sensetivity);
+
+            carbRatio = 500/totalInsulin
+            carbRatio = carbRatio.toFixed(2);
+            carbRatio = parseFloat(carbRatio);
 
             localStorage.setItem("weight", weight);
             localStorage.setItem("age", age);
@@ -287,13 +300,10 @@
             document.getElementById("rebolus").textContent = bolus;
             document.getElementById("rebasal").textContent = basal;
 
-            document.getElementById("rebolus").style.color = "blue";
             
             document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensetivity;
+            document.getElementById("carbRatio").textContent = "One unit of fast-acting insulin covers approximately " + carbRatio + " grams of carbohydrates.";
 
-            document.getElementById("rebasal").style.color = "blue";
-
-            document.getElementById("insulinSensitivity").style.color = "blue";
 
             if (basal < 0) {
                 swal("Be careful!", "It seems you are putting too much basal! Try reducing it. " + Math.abs(bolus), "error");
@@ -455,6 +465,9 @@
                 document.getElementById("rebolus").textContent = bolus;
                 document.getElementById("rebasal").textContent = basal;
                 document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensitivity123;
+                document.getElementById("carbRatio").textContent = "One unit of fast-acting insulin covers approximately " + carbRatio + " grams of carbohydrates.";
+
+
 
             } else {
                 swal("Welcome!", "Set up your profile to get started.", "info");
@@ -463,6 +476,7 @@
             if (bolus < 0) {
                 document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
                 document.getElementById("rebolus").style.color = "red";
+                
             }
 
             generateInsulinGraph();
