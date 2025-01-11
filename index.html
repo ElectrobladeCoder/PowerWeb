@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <link
     rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
+    
+<style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -559,23 +560,12 @@
         </div>
     </section>
 
-    <section id="personalizeProfile">
-        <h2>Personalize Your Profile</h2>
-        <div class="mb-3">
-            <input type="number" id="bodyweight" class="form-control" placeholder="Body Weight (kg)">
-            <input type="number" id="age123" class="form-control" placeholder="Age">
-            <input type="number" id="dosedBasal" class="form-control" placeholder="Basal Dose (optional)">
-            
-        </div>
-        <button class="btn btn-success" onclick="submitData()">Submit</button>
-    </section>
-
     <section id="insulinInfo">
         <h2>Insulin Information</h2>
-        <p><b>Bolus Left: </b><span id="rebolus">Set up your profile first!</span></p>
-        <p><b>Basal Left: </b><span id="rebasal">Set up your profile first!</span></p>
-        <p><b>Insulin Sensitivity Description (Correction Factor): </b><span id="insulinSensitivity">Set up your profile first!</span></p>
-        <p><b>Carbohydrate Ratio: </b><span id="carbRatio">Set up your profile first!</span></p>
+        <p><b>Bolus Left: </b><span id="rebolus">Set up your profile first in the profile tab above!</span></p>
+        <p><b>Basal Left: </b><span id="rebasal">Set up your profile first in the profile tab above!!</span></p>
+        <p><b>Insulin Sensitivity Description (Correction Factor): </b><span id="insulinSensitivity">Set up your profile first in the profile tab above!!</span></p>
+        <p><b>Carbohydrate Ratio: </b><span id="carbRatio">Set up your profile first in the profile tab above!!</span></p>
     </section>
 
     <section id="dangerArea" class="danger-section">
@@ -617,7 +607,16 @@
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <span id="profileCloseTag" class="close" onclick="closeModal('profileModal')">&times;</span>
-            <iframe src="https://www.example.com/profile" title="Profile"></iframe>
+            <section id="personalizeProfile">
+              <h2 id="profileModalHeading">Personalize Your Profile</h2>
+              <div class="mb-3">
+                  <input type="number" id="bodyweight" class="form-control" placeholder="Body Weight (kg)">
+                  <input type="number" id="age123" class="form-control" placeholder="Age">
+                  <input type="number" id="dosedBasal" class="form-control" placeholder="Basal Dose (optional)">
+                  
+              </div>
+              <button class="btn btn-success" onclick="submitData()">Submit</button>
+          </section>
         </div>
     </div>
 
@@ -809,6 +808,7 @@
             localStorage.setItem("lastLogin", new Date().toLocaleDateString());
 
             displayInsulinLogs();
+            closeModal('profileModal');
         }
 
         function deleteAllData() {
@@ -844,7 +844,7 @@
             localStorage.setItem("totalAllowedBolus", bolus);
 
             let logs = JSON.parse(localStorage.getItem("insulinLogs")) || [];
-            logs.push({ time: insulinTime, amount: insulinAmount });
+            logs.push({time: insulinTime, amount: insulinAmount});
             localStorage.setItem("insulinLogs", JSON.stringify(logs));
             
             document.getElementById("rebolus").textContent = bolus;
@@ -966,7 +966,7 @@
 
 
             } else {
-                swal("Welcome!", "Set up your profile to get started.", "info");
+                swal("Welcome!", "Set up your profile to get started. Set it up in the profile tab.", "info");
             }
             
             if (bolus < 0) {
@@ -1030,6 +1030,16 @@
 
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
+
+            if (modalId === 'modal1') {
+              const weightData = localStorage.getItem("weight");
+              if (!weightData) {
+                document.getElementById("profileModalHeading").textContent = "Set up your profile!";
+              }
+              else {
+                document.getElementById("profileModalHeading").textContent = "Update your profile!";
+              }
+            }
         }
 
         function closeModal(modalId) {
