@@ -610,13 +610,51 @@
             <section id="personalizeProfile">
               <h2 id="profileModalHeading">Personalize Your Profile</h2>
               <div class="mb-3">
-                  <input type="number" id="bodyweight" class="form-control" placeholder="Body Weight (kg)">
-                  <input type="number" id="age123" class="form-control" placeholder="Age">
-                  <input type="number" id="dosedBasal" class="form-control" placeholder="Basal Dose (optional)">
-                  
-              </div>
-              <button class="btn btn-success" onclick="submitData()">Submit</button>
+                  <!-- Input for Body Weight -->
+                  <label for="bodyweight" class="form-label">Body Weight (kg)</label>
+                  <input type="number" id="bodyweight" class="form-control" placeholder="Enter your body weight (kg)" min="1">
+
+                  <!-- Input for Personal Data -->
+                   <label for="userName" class="form-label mt-3">Name</label>
+                  <input type="text" id="userName" class="form-control" placeholder="Enter your full name" min="1">
+          
+                  <!-- Input for Age -->
+                  <label for="age123" class="form-label mt-3">Age</label>
+                  <input type="number" id="age123" class="form-control" placeholder="Enter your age" min="1">
+          
+                  <!-- Input for Basal Dose -->
+                  <label for="dosedBasal" class="form-label mt-3">Basal Dose (optional)</label>
+                  <input type="number" id="dosedBasal" class="form-control" placeholder="Enter basal dose (if applicable)" min="0">
+          
+                  <!-- Dropdown for Basal Type -->
+                  <label for="basalType" class="form-label mt-3">Basal Type</label>
+                  <select id="basalType" class="form-control">
+                      <option value="" disabled selected>Select Basal Type</option>
+                      <option value="longacting">Long-Acting (Lantus, other glargine insulins)</option>  <!-- Last for up to 24hrs -->
+                      <option value="intermediate">Intermediate-acting (NPH (Humulin N, Novolin N))</option>  <!-- Last for up to 12hrs -->
+                      <option value="ultra-long-acting">Ultra-Long Acting (Toujeo, Tresiba)</option>  <!-- Last for up to 36hrs -->
+                  </select>
+                  <!-- Dropdown for Bolus Type -->
+                  <label for="bolusType" class="form-label mt-3">Bolus Type</label>
+                  <select id="bolusType" class="form-control">
+                      <option value="" disabled selected>Select Bolus Type</option>
+                      <option value="fastacting">Fast Acting</option>  <!-- Last for up to 24hrs -->
+                      <option value="rapid-acting">Rapid Acting</option>
+                  </select>
+          
+                  <!-- Input for Activity Level -->
+                  <label for="activityLevel" class="form-label mt-3">Activity Level</label>
+                  <select id="activityLevel" class="form-control">
+                      <option value="" disabled selected>Select Activity Level</option>
+                      <option value="sedentary">Sedentary</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="active">Active</option>
+                  </select>
+              
+              <!-- Submit Button -->
+              <button class="btn btn-success mt-3" onclick="submitData()">Submit</button>
           </section>
+          
         </div>
     </div>
 
@@ -750,7 +788,7 @@
             const basalDose = parseFloat(document.getElementById("dosedBasal").value);
 
 
-            if (!weight || !age) {
+            if (!weight || !age || !document.getElementById("basalType").value || !document.getElementById("bolusType").value || !document.getElementById("activityLevel").value) {
                 swal("Error!", "Please fill in all required fields.", "error");
                 return;
             }
@@ -788,6 +826,15 @@
             document.getElementById("rebasal").textContent = basal;
 
             localStorage.setItem("carbRatio", carbRatio);
+
+            const bolustype = document.getElementById("bolusType").value;
+            const basaltype = document.getElementById("basalType").value;
+
+            localStorage.setItem("bolusType", bolustype);
+            localStorage.setItem("basalType", basaltype);
+
+            const activityLevel = document.getElementById("activityLevel").value;
+            localStorage.setItem("activityLevel", activityLevel);
 
             
             document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensetivity;
