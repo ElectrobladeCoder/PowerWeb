@@ -10,6 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <link
     rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     
 <style>
         body {
@@ -530,6 +533,7 @@
         <a href="#" onclick="openModal('profileModal')">Profile</a>
         <a href="#" onclick="openModal('moreOptionsModal')">More Options</a>
         <a href="#" onclick="openModal('insulinCalculatorModal')">Insulin Dosage Calculator</a>
+        <a href="#" onclick="openModal('reportGenerationModal')">Report Generation</a>
     </div>
 
     <div class="center-wrapper">
@@ -547,7 +551,15 @@
         <h2>Insulin Record</h2>
         <div class="mb-3">
             <input type="number" id="insulinno" class="form-control" placeholder="Enter amount of insulin">
+
             <input type="datetime-local" id="insulintime" class="form-control">
+
+            <label for="insulinTypeInjected" class="form-label mt-3">Insulin Type</label>
+            <select id="insulinTypeInjected" class="form-control">
+                <option value="" disabled selected>Select an option</option>
+                <option value="basal">Basal</option>
+                <option value="bolus">Bolus</option>
+            </select>
         </div>
         <button class="btn btn-primary" onclick="submitInsulin()">Submit</button>
         <canvas id="insulinChart" class="mt-4"></canvas>
@@ -741,6 +753,20 @@
         </div>
     </div>
 
+    <div id="reportGenerationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="reportGenerationCloseTag" class="close" onclick="closeModal('reportGenerationModal')">&times;</span>
+            <h3 style="color: white;">Report Generation</h3>
+            <p id="reportPatientName" style="color: white;">Patient Name: </p>
+            <div id="reportLogContainer">
+              <p style="color: white;">No logs available at the moment. Log some insulin to get started!</p>
+            </div>
+
+            <canvas id="reportInsulinChart" class="mt-4" style="background-color: white;"></canvas>
+
+          </div>
+    </div>
+
 
     
     <style>
@@ -870,25 +896,35 @@
         function submitInsulin() {
             const insulinAmount = parseFloat(document.getElementById("insulinno").value);
             const insulinTime = document.getElementById("insulintime").value;
+            const insulinTypeInjected = document.getElementById("insulinTypeInjected").value;
+            let bolus = parseFloat(localStorage.getItem("totalAllowedBolus")) || 0;
+            let basal = parseFloat(localStorage.getItem("totalAllowedBasal")) || 0;
             
             if (rebolus.textContent === "Set up your profile first!" || rebasal.textContent === "Set up your profile first!") {
                 swal("Cannot Log Insulin!", "Please finish customizing your profile first.", "error");
                 return;
             }
-            if (!insulinAmount || !insulinTime) {
+            if (!insulinAmount || !insulinTime || !insulinTypeInjected) {
                 swal("Error!", "Please fill in both fields.", "error");
                 return;
             }
+
             const selectedTime = new Date(insulinTime);
             const currentTime = new Date();
             if (selectedTime > currentTime) {
                 swal("Invalid Date or Time!", "You cannot log insulin for a future date or time.", "error");
                 return;
             }
+            if (insulinTypeInjected === "bolus") {
 
-            let bolus = parseFloat(localStorage.getItem("totalAllowedBolus")) || 0;
-            bolus -= insulinAmount;
-            localStorage.setItem("totalAllowedBolus", bolus);
+              bolus -= insulinAmount;
+              localStorage.setItem("totalAllowedBolus", bolus);
+            }
+            if (insulinTypeInjected === "basal") {
+
+              basal -= insulinAmount;
+              localStorage.setItem("totalAllowedBasal", basal);
+            }
 
             let logs = JSON.parse(localStorage.getItem("insulinLogs")) || [];
             logs.push({time: insulinTime, amount: insulinAmount});
@@ -896,6 +932,9 @@
             
             document.getElementById("rebolus").textContent = bolus;
             document.getElementById("rebolus").style.color = "blue";
+            document.getElementById("rebasal").textContent = basal;
+            document.getElementById("rebasal").style.color = "blue";
+            
             if (bolus < 0) {
                 swal("Be careful!", "Bolus limit exceeded by " + Math.abs(bolus), "error");
                 document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
@@ -924,10 +963,10 @@
                 logDiv.classList.add("insulin-log");
 
                 const amountSpan = document.createElement("span");
-                amountSpan.textContent = `${log.amount} units injected at `;
+                amountSpan.textContent = `${log.amount} units`;
 
                 const timeSpan = document.createElement("span");
-                timeSpan.textContent = `${new Date(log.time).toLocaleString()}.`;
+                timeSpan.textContent = `${new Date(log.time).toLocaleString()}. Amount injected: `;
 
                 
 
@@ -977,6 +1016,47 @@
                 }
             });
         }
+
+
+        function generateReportInsulinGraph() {
+            const logs = JSON.parse(localStorage.getItem("insulinLogs")) || [];
+            const labels = logs.map(log => new Date(log.time).toLocaleString());
+            const data = logs.map(log => log.amount);
+
+            const ctx = document.getElementById('reportInsulinChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Insulin Amount',
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Time' } },
+                        y: { title: { display: true, text: 'Insulin Amount' }, beginAtZero: true },
+                    },
+                }
+            });
+        }
+
 
         function startUp() {
             const bolus = localStorage.getItem("totalAllowedBolus");
@@ -1078,7 +1158,7 @@
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
 
-            if (modalId === 'modal1') {
+            if (modalId === 'profileModal') {
               const weightData = localStorage.getItem("weight");
               if (!weightData) {
                 document.getElementById("profileModalHeading").textContent = "Set up your profile!";
@@ -1087,8 +1167,15 @@
                 document.getElementById("profileModalHeading").textContent = "Update your profile!";
               }
             }
-        }
 
+            if (modalId === 'reportGenerationModal') {
+              const logs = JSON.parse(localStorage.getItem("insulinLogs"));
+              const patientName = localStorage.getItem("userName");
+              document.getElementById("reportPatientName").textContent = patientName;
+              document.getElementById("reportLogContainer").textContent = logs;
+
+        }
+      }
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
