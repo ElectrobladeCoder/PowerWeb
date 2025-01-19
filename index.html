@@ -1203,10 +1203,9 @@
 
             } else {
               timecard.style.cssText = 'linear-gradient(to right, rgb(20, 30, 48), rgb(36, 59, 85)) !important;';
-            
+            }
             document.getElementById('time-text').textContent = `${hourValue}:${formattedMinute}`;
             document.getElementById('date-text').textContent = `${dayName}, ${monthName} ${dateValue}, ${yearValue}`;
-        }
       }
 
         function updateDateTimePlease() {
@@ -1216,6 +1215,8 @@
 
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
+            document.getElementById(modalId).style.display = 'block';
+            document.querySelector('.floating-btn').style.display = 'hidden'; // Hide the button
 
             if (modalId === 'profileModal') {
               const weightData = localStorage.getItem("weight");
@@ -1313,8 +1314,8 @@
                 }
             });
         };
+updateDateTimePlease();
 
-        updateDateTimePlease();
 </script>
 
 </body>
