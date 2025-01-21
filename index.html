@@ -901,8 +901,8 @@
 
     <script>
         let chartInstance = null;
-        const supabaseUrl = process.env.VITE_SUPABASE_URL;
-        const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+        const supabaseUrl = "${SUPABASE_URL}";
+        const supabaseAnonKey = "${SUPABASE_ANON_KEY}";
         const supabase = createClient(supabaseUrl, supabaseKey)
         console.log(supabaseUrl)
         console.log(supabaseAnonKey)
@@ -1005,71 +1005,7 @@
             closeModal('profileModal');
         }
 
-        function startUp() {
-            const bolus = localStorage.getItem("totalAllowedBolus");
-            const basal = localStorage.getItem("totalAllowedBasal");
-            const insulin_sensitivity123 = localStorage.getItem("isf");
-            const currentDate = new Date().toLocaleDateString();
-            const lastLogin = localStorage.getItem("lastLogin");
-            const dailybasal = localStorage.getItem("dailyAllowedBasal");
-            const dailybolus = localStorage.getItem("dailyAllowedBolus");
-            const themeSwitch = document.getElementById('input-theme');
-            const dataCardElements = document.getElementsByClassName('mt-3');
-            const carbRatio = localStorage.getItem("carbRatio");
 
-
-            
-            
-
-
-            if (lastLogin !== currentDate) {
-                swal("New day, new you!", "All your insulin data is backed up!", "success");
-                localStorage.setItem("lastLogin", currentDate);
-                localStorage.setItem("totalAllowedBolus", dailybolus);
-                localStorage.setItem("totalAllowedBasal", dailybasal);
-                location.reload();
-            }
-
-            
-            if (bolus && basal && insulin_sensitivity123) {
-                swal("Welcome back!", "All your insulin data is backed up!", "success");
-                document.getElementById("rebolus").textContent = bolus;
-                document.getElementById("rebasal").textContent = basal;
-                document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensitivity123;
-                document.getElementById("carbRatio").textContent = "One unit of fast-acting insulin covers approximately " + carbRatio + " grams of carbohydrates.";
-
-
-
-            } else {
-                swal("Welcome!", "Set up your profile to get started. Set it up in the profile tab.", "info");
-            }
-            
-            if (bolus < 0) {
-                document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
-                document.getElementById("rebolus").style.color = "red";
-                
-            }
-
-            if (themeSwitch.checked) {
-                    document.body.style.backgroundColor = 'black';
-            } else {
-                document.body.style.backgroundColor = 'white';
-            }
-            updateDateTimeDisplay();
-            generateInsulinGraph();
-            displayInsulinLogs();
-
-
-            themeSwitch.addEventListener('change', function() {
-                if (themeSwitch.checked) {
-                    document.body.style.backgroundColor = 'black';
-                } else {
-                    document.body.style.backgroundColor = 'white';
-                }
-            });
-
-
-        }
 
         
 
@@ -1206,6 +1142,72 @@
             });
         }
 
+
+                function startUp() {
+            const bolus = localStorage.getItem("totalAllowedBolus");
+            const basal = localStorage.getItem("totalAllowedBasal");
+            const insulin_sensitivity123 = localStorage.getItem("isf");
+            const currentDate = new Date().toLocaleDateString();
+            const lastLogin = localStorage.getItem("lastLogin");
+            const dailybasal = localStorage.getItem("dailyAllowedBasal");
+            const dailybolus = localStorage.getItem("dailyAllowedBolus");
+            const themeSwitch = document.getElementById('input-theme');
+            const dataCardElements = document.getElementsByClassName('mt-3');
+            const carbRatio = localStorage.getItem("carbRatio");
+
+
+            
+            
+
+
+            if (lastLogin !== currentDate) {
+                swal("New day, new you!", "All your insulin data is backed up!", "success");
+                localStorage.setItem("lastLogin", currentDate);
+                localStorage.setItem("totalAllowedBolus", dailybolus);
+                localStorage.setItem("totalAllowedBasal", dailybasal);
+                location.reload();
+            }
+
+            
+            if (bolus && basal && insulin_sensitivity123) {
+                swal("Welcome back!", "All your insulin data is backed up!", "success");
+                document.getElementById("rebolus").textContent = bolus;
+                document.getElementById("rebasal").textContent = basal;
+                document.getElementById("insulinSensitivity").textContent = "One unit of fast-acting insulin drops your blood sugar by approximately " + insulin_sensitivity123;
+                document.getElementById("carbRatio").textContent = "One unit of fast-acting insulin covers approximately " + carbRatio + " grams of carbohydrates.";
+
+
+
+            } else {
+                swal("Welcome!", "Set up your profile to get started. Set it up in the profile tab.", "info");
+            }
+            
+            if (bolus < 0) {
+                document.getElementById("rebolus").textContent = "Limit exceeded by " + Math.abs(bolus);
+                document.getElementById("rebolus").style.color = "red";
+                
+            }
+
+            if (themeSwitch.checked) {
+                    document.body.style.backgroundColor = 'black';
+            } else {
+                document.body.style.backgroundColor = 'white';
+            }
+            updateDateTimeDisplay();
+            generateInsulinGraph();
+            displayInsulinLogs();
+
+
+            themeSwitch.addEventListener('change', function() {
+                if (themeSwitch.checked) {
+                    document.body.style.backgroundColor = 'black';
+                } else {
+                    document.body.style.backgroundColor = 'white';
+                }
+            });
+
+
+        }
 
         
 
