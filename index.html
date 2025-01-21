@@ -12,6 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <df-messenger
   intent="WELCOME"
   chat-title="Insulin Guide"
@@ -676,7 +678,7 @@
     </section>
     
     <!-- Floating Modal Trigger Button -->
-    <button class="btn btn-warning floating-btn move-left" data-bs-toggle="modal" data-bs-target="#infoModal">
+    <button class="btn btn-warning floating-btn move-left" data-bs-toggle="modal" onclick="openModal('infoModal')">
         Contact Us
     </button>
     
@@ -901,28 +903,6 @@
 
     <script>
         let chartInstance = null;
-        const supabaseUrl = "${SUPABASE_URL}";
-        const supabaseAnonKey = "${SUPABASE_ANON_KEY}";
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
-        console.log(supabaseUrl)
-        console.log(supabaseAnonKey)
-
-        async function logDatainCloud(){
-                const { data, error } = await supabase
-                .from('users')  // 'users' is your table name
-                .insert([
-                  {
-                    name: 'John Doe',
-                    email: 'john.doe@example.com',
-                  },
-                ]);
-
-              if (error) {
-                console.error('Error inserting data:', error);
-              } else {
-                console.log('Inserted data:', data);
-              }
-            }
 
         function submitData() {
             const weight = parseFloat(document.getElementById("bodyweight").value);
@@ -999,15 +979,9 @@
             
             localStorage.setItem("lastLogin", new Date().toLocaleDateString());
 
-
-            logDatainCloud();
             displayInsulinLogs();
             closeModal('profileModal');
         }
-
-
-
-        
 
         function deleteAllData() {
             swal("Warning!", "All data will be deleted!", "warning");
@@ -1143,7 +1117,7 @@
         }
 
 
-                function startUp() {
+        function startUp() {
             const bolus = localStorage.getItem("totalAllowedBolus");
             const basal = localStorage.getItem("totalAllowedBasal");
             const insulin_sensitivity123 = localStorage.getItem("isf");
@@ -1208,8 +1182,6 @@
 
 
         }
-
-        
 
 
     const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
