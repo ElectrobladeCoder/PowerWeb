@@ -903,7 +903,7 @@
         let chartInstance = null;
         const supabaseUrl = "${SUPABASE_URL}";
         const supabaseAnonKey = "${SUPABASE_ANON_KEY}";
-        const supabase = createClient(supabaseUrl, supabaseKey)
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey)
         console.log(supabaseUrl)
         console.log(supabaseAnonKey)
 
