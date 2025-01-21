@@ -901,6 +901,26 @@
 
     <script>
         let chartInstance = null;
+        const supabaseUrl = process.env.VITE_SUPABASE_URL;
+        const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        async function logDatainCloud(){
+                const { data, error } = await supabase
+                .from('users')  // 'users' is your table name
+                .insert([
+                  {
+                    name: 'John Doe',
+                    email: 'john.doe@example.com',
+                  },
+                ]);
+
+              if (error) {
+                console.error('Error inserting data:', error);
+              } else {
+                console.log('Inserted data:', data);
+              }
+            }
 
         function submitData() {
             const weight = parseFloat(document.getElementById("bodyweight").value);
@@ -977,9 +997,13 @@
             
             localStorage.setItem("lastLogin", new Date().toLocaleDateString());
 
+
+            logDatainCloud();
             displayInsulinLogs();
             closeModal('profileModal');
         }
+
+        
 
         function deleteAllData() {
             swal("Warning!", "All data will be deleted!", "warning");
@@ -1127,6 +1151,8 @@
             const dataCardElements = document.getElementsByClassName('mt-3');
             const carbRatio = localStorage.getItem("carbRatio");
 
+            console.log(subabaseUrl)
+            console.log(supabaseAnonKey)
             
             
 
